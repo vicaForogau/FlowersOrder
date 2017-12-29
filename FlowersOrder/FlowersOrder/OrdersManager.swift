@@ -25,7 +25,7 @@ public protocol OrdersManagerProtocol : NSObjectProtocol {
 class OrdersManager {
     
     private static var sharedOrdersManager: OrdersManager = {
-        let orderManager = OrdersManager.init()
+        let orderManager = OrdersManager()
         return orderManager
     }()
     
@@ -76,7 +76,6 @@ class OrdersManager {
                         }
                     }
                 }
-                
                 self.delegate?.didUpdatedOrders(orders: self.orders as NSArray)
             }
         }
