@@ -6,6 +6,7 @@ target 'FlowersOrder' do
 # Pods for FlowersOrder
 
   pod 'Alamofire', '~> 4.5'
+  pod 'AlamofireImage', '~> 3.0'
 
   target 'FlowersOrderTests' do
     inherit! :search_paths

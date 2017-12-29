@@ -15,11 +15,24 @@ class Order: NSObject {
     var deliverTo : String
     var delivered : Bool?
     var address : String
+    var imageUrl: String?
     
     init?(data : NSDictionary) {
         
         // The id must not be empty
         guard data["id"] != nil else {
+            return nil
+        }
+        // The description must not be empty
+        guard data["description"] != nil else {
+            return nil
+        }
+        // The deliver_to must not be empty
+        guard data["deliver_to"] != nil else {
+            return nil
+        }
+        // The address must not be empty
+        guard data["address"] != nil else {
             return nil
         }
         
@@ -29,5 +42,6 @@ class Order: NSObject {
         self.deliverTo = data["deliver_to"] as! String
         self.delivered = data["deliverd"] as? Bool
         self.address = data["address"] as! String
+        self.imageUrl = data["imgUrl"] as? String
     }
 }

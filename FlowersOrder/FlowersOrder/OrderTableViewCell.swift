@@ -7,13 +7,17 @@
 //
 
 import UIKit
+import Alamofire
 
 class OrderTableViewCell: UITableViewCell {
     
     @IBOutlet weak var orderDescriptionLabel: UILabel!
     @IBOutlet weak var orderPriceLabel: UILabel!
     @IBOutlet weak var deliverToLabel: UILabel!
-    @IBOutlet weak var statusImg: UIImageView!
+    @IBOutlet var orderImgView: UIImageView!
+    @IBOutlet var loadingIndicator: UIActivityIndicatorView!
+    
+    var request: Request?
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -27,15 +31,23 @@ class OrderTableViewCell: UITableViewCell {
     }
     
     func updateWithOrder(order :Order) {
+        self.orderImgView.image = nil
+        self.request?.cancel()
         self.orderDescriptionLabel.text = order.orderDescription as String
         self.orderPriceLabel.text = "\(order.price) euro"
         self.deliverToLabel.text = order.deliverTo as String
         
-        if order.delivered == true {
-            self.statusImg.isHidden = false
-        } else {
-            self.statusImg.isHidden = true
+        if let image = OrdersManager.shared().cachedImage(for: order.imageUrl!) {
+            self.loadingIndicator.stopAnimating()
+            self.orderImgView.image = image
+            return
         }
+        loadingIndicator.startAnimating()
+        request = OrdersManager.shared().retrieveImage(for: order.imageUrl!) { image in
+            self.loadingIndicator.stopAnimating()
+            self.orderImgView.image = image
+        }
+        
     }
 
 }

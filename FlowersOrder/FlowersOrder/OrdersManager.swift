@@ -8,26 +8,36 @@
 
 import Foundation
 import Alamofire
+import AlamofireImage
+
+extension UInt64 {
+    
+    func megabytes() -> UInt64 {
+        return self * 1024 * 1024
+    }
+}
 
 public protocol OrdersManagerProtocol : NSObjectProtocol {
+    
     func didUpdatedOrders(orders:NSArray)
 }
 
 class OrdersManager {
     
     private static var sharedOrdersManager: OrdersManager = {
-        let orderManager = OrdersManager()
-        
-        // Configuration
-        // ...
+        let orderManager = OrdersManager.init()
         return orderManager
     }()
     
     // MARK: -
-    let baseURL = "http://demo6736331.mockable.io/getOrders"
+    let baseURL = "http://demo8679132.mockable.io/getOrders"
     var orders = [Order]()
     var delegate: OrdersManagerProtocol?
     
+    let imageCache = AutoPurgingImageCache(
+        memoryCapacity: UInt64(100).megabytes(),
+        preferredMemoryUsageAfterPurge: UInt64(60).megabytes()
+    )
     
     // Initialization
     private init() {
@@ -79,6 +89,26 @@ class OrdersManager {
             }
         }
         self.delegate?.didUpdatedOrders(orders: self.orders as NSArray)
+    }
+    
+    //MARK: - Image Downloading
+    
+    func retrieveImage(for url: String, completion: @escaping (UIImage) -> Void) -> Request {
+        return Alamofire.request(url, method: .get).responseImage { response in
+            guard let image = response.result.value else { return }
+            completion(image)
+            self.cache(image, for: url)
+        }
+    }
+    
+    //MARK: - Image Caching
+    
+    func cache(_ image: Image, for url: String) {
+        imageCache.add(image, withIdentifier: url)
+    }
+    
+    func cachedImage(for url: String) -> Image? {
+        return imageCache.image(withIdentifier: url)
     }
         
 
